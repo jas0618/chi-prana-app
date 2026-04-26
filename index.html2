@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Chi · Prana — Daily Energy App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+ 
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    body {
+      background: #2C2C2A;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px 0;
+    }
+ 
+    .app {
+      font-family: 'DM Sans', sans-serif;
+      background: #FBF7EF;
+      min-height: 100vh;
+      color: #2C2C2A;
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+    }
+ 
+    /* ── Top bar ── */
+    .top-bar {
+      background: #1a1208;
+      color: #F7C75A;
+      padding: 14px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .top-bar .day-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #EF9F27;
+      font-style: italic;
+    }
+    .top-bar .app-name {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #888780;
+    }
+    .top-bar .element-badge {
+      font-size: 11px;
+      background: rgba(247,199,90,0.13);
+      color: #F7C75A;
+      border: 0.5px solid rgba(247,199,90,0.33);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+ 
+    /* ── Tab views ── */
+    .tab-view { display: none; }
+    .tab-view.active { display: block; }
+ 
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(160deg, #1a1208 0%, #2c1f08 60%, #3b2a10 100%);
+      padding: 28px 20px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(239,159,39,0.2) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 300;
+      color: #FAF0D7;
+      line-height: 1.1;
+    }
+    .hero-sub {
+      font-size: 12px;
+      color: #888780;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+    .element-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+    .element-chip {
+      background: rgba(255,255,255,0.05);
+      border: 0.5px solid rgba(255,255,255,0.13);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: #D3C9B0;
+    }
+    .element-chip.active {
+      background: rgba(239,159,39,0.13);
+      border-color: #EF9F27;
+      color: #FAC775;
+    }
+    .compass-ring {
+      position: absolute;
+      bottom: -30px; right: -30px;
+      width: 120px; height: 120px;
+      border: 0.5px solid rgba(239,159,39,0.2);
+      border-radius: 50%;
+    }
+    .compass-ring2 {
+      position: absolute;
+      bottom: -10px; right: -10px;
+      width: 80px; height: 80px;
+      border: 0.5px solid rgba(239,159,39,0.33);
+      border-radius: 50%;
+    }
+ 
+    /* ── Teaching strips ── */
+    .vastu-strip {
+      background: #E6F1FB;
+      border-left: 3px solid #378ADD;
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px;
+      margin: 0 20px 8px;
+      font-size: 12px;
+      color: #0C447C;
+      line-height: 1.5;
+    }
+    .feng-strip {
+      background: #EAF3DE;
+      border-left: 3px solid #639922;
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px;
+      margin: 0 20px 20px;
+      font-size: 12px;
+      color: #27500A;
+      line-height: 1.5;
+    }
+    .strip-label {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 3px;
+      opacity: 0.7;
+    }
+ 
+    /* ── Section ── */
+    .section { padding: 20px 20px 0; }
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #888780;
+      margin-bottom: 12px;
+    }
+ 
+    /* ── Colour cards ── */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .color-card {
+      border-radius: 14px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .color-card:hover { transform: scale(1.02); }
+    .color-swatch {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .color-name  { font-size: 14px; font-weight: 500; margin-bottom: 2px; color: inherit; }
+    .color-reason { font-size: 11px; opacity: 0.7; line-height: 1.4; color: inherit; }
+    .power-tag {
+      position: absolute;
+      top: 10px; right: 10px;
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.15);
+      padding: 2px 8px;
+      border-radius: 10px;
+      color: inherit;
+      opacity: 0.8;
+    }
+ 
+    /* ── Avoid strip ── */
+    .avoid-strip {
+      background: #fff8ee;
+      border: 0.5px solid rgba(239,159,39,0.33);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 0 20px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avoid-dot { width: 10px; height: 10px; border-radius: 50%; background: #E24B4A; flex-shrink: 0; }
+    .avoid-text { font-size: 12px; color: #5F5E5A; line-height: 1.5; }
+ 
+    /* ── Divider ── */
+    .divider { height: 0.5px; background: #D3D1C7; margin: 0 20px 20px; }
+ 
+    /* ── Activities ── */
+    .activities-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .activity-item {
+      background: white;
+      border: 0.5px solid #D3D1C7;
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .activity-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .icon-gold   { background: #FAEEDA; }
+    .icon-blue   { background: #E6F1FB; }
+    .icon-green  { background: #EAF3DE; }
+    .icon-purple { background: #EEEDFE; }
+    .activity-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+    .activity-desc { font-size: 11px; color: #888780; line-height: 1.4; }
+ 
+    /* ── Outfit scanner ── */
+    .outfit-scanner {
+      margin: 0 20px 20px;
+      background: #1a1208;
+      border-radius: 18px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .scanner-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 300;
+      color: #FAF0D7;
+      margin-bottom: 4px;
+    }
+    .scanner-sub {
+      font-size: 11px;
+      color: #888780;
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+    .upload-zone {
+      border: 1px dashed rgba(239,159,39,0.4);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.03);
+      position: relative;
+    }
+    .upload-zone:hover { border-color: #EF9F27; background: rgba(239,159,39,0.06); }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon  { font-size: 28px; margin-bottom: 8px; }
+    .upload-label { font-size: 13px; color: #EF9F27; font-weight: 500; display: block; margin-bottom: 4px; }
+    .upload-hint  { font-size: 11px; color: #888780; }
+    .preview-img  { width: 100%; border-radius: 10px; margin-bottom: 12px; display: none; max-height: 220px; object-fit: cover; }
+    .scan-btn {
+      width: 100%; background: #EF9F27; color: #1a1208; border: none; border-radius: 10px;
+      padding: 12px; font-size: 13px; font-weight: 500; cursor: pointer; display: none;
+      letter-spacing: 0.5px; transition: opacity 0.15s; font-family: 'DM Sans', sans-serif; margin-top: 12px;
+    }
+    .scan-btn:hover    { opacity: 0.85; }
+    .scan-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+ 
+    /* ── Result panel ── */
+    .result-panel {
+      background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.13);
+      border-radius: 12px; padding: 16px; margin-top: 12px; display: none;
+    }
+    .result-verdict { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; margin-bottom: 6px; }
+    .verdict-yes { color: #9FE1CB; }
+    .verdict-no  { color: #F5C4B3; }
+    .verdict-ok  { color: #FAC775; }
+    .result-detail { font-size: 12px; color: #B4B2A9; line-height: 1.6; }
+    .result-tags   { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .result-tag    { font-size: 10px; border-radius: 20px; padding: 3px 10px; letter-spacing: 0.5px; }
+    .tag-good { background: #085041; color: #9FE1CB; }
+    .tag-warn { background: #633806; color: #FAC775; }
+    .tag-bad  { background: #791F1F; color: #F7C1C1; }
+ 
+    /* ── Loading dots ── */
+    .loading-dots { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle; }
+    .loading-dots span { width: 4px; height: 4px; background: #1a1208; border-radius: 50%; animation: bounce 1.2s infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+      40% { opacity: 1; transform: translateY(-3px); }
+    }
+ 
+    /* ── Nav bar ── */
+    .nav-bar {
+      background: #1a1208;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0 18px;
+      border-top: 0.5px solid #333;
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+      color: #888780; cursor: pointer; padding: 2px 12px; transition: color 0.15s;
+    }
+    .nav-item.active { color: #EF9F27; }
+    .nav-icon { font-size: 18px; line-height: 1; }
+ 
+    /* ── API key notice ── */
+    .api-notice {
+      background: #FAEEDA; border: 0.5px solid #EF9F27; border-radius: 10px;
+      padding: 12px 14px; margin: 0 20px 16px; font-size: 11px; color: #633806; line-height: 1.6;
+    }
+    .api-notice strong { display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+    .api-key-input {
+      width: 100%; margin-top: 8px; padding: 8px 10px;
+      border: 0.5px solid #EF9F27; border-radius: 8px; background: white;
+      font-size: 12px; font-family: monospace; color: #2C2C2A; outline: none;
+    }
+ 
+    /* ════════════════════════════════════════
+       WEEK VIEW
+    ════════════════════════════════════════ */
+    .week-hero {
+      background: linear-gradient(160deg, #1a1208 0%, #2c1f08 60%, #3b2a10 100%);
+      padding: 28px 20px 24px;
+    }
+    .week-hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 30px; font-weight: 300; color: #FAF0D7; line-height: 1.1; margin-bottom: 4px;
+    }
+    .week-hero-sub { font-size: 11px; color: #888780; letter-spacing: 1.5px; text-transform: uppercase; }
+ 
+    .week-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+    .week-card {
+      background: white; border: 0.5px solid #D3D1C7; border-radius: 16px;
+      padding: 14px 16px; display: flex; align-items: center; gap: 14px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .week-card:hover { border-color: #EF9F27; background: #fffdf8; transform: translateX(2px); }
+    .week-card.today { border-color: #EF9F27; background: #fffdf8; }
+    .week-day-badge {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; font-weight: 500;
+    }
+    .week-day-num { font-size: 18px; font-weight: 500; line-height: 1; }
+    .week-day-info { flex: 1; }
+    .week-day-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .week-day-planet { font-size: 11px; color: #888780; margin-bottom: 4px; font-style: italic; }
+    .week-color-dots { display: flex; gap: 4px; }
+    .week-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .week-badge-label { font-size: 9px; letter-spacing: 0.5px; margin-top: 2px; }
+    .today-tag {
+      background: rgba(239,159,39,0.15); color: #EF9F27;
+      font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 10px; border: 0.5px solid rgba(239,159,39,0.4);
+      flex-shrink: 0;
+    }
+ 
+    /* ════════════════════════════════════════
+       VASTU VIEW
+    ════════════════════════════════════════ */
+    .vastu-hero {
+      background: linear-gradient(160deg, #0c2a4a 0%, #1a3a5c 60%, #1e4570 100%);
+      padding: 28px 20px 32px; position: relative; overflow: hidden;
+    }
+    .vastu-hero::before {
+      content: ''; position: absolute; top: -20px; right: -20px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(55,138,221,0.3) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .vastu-hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px; font-weight: 300; color: #E6F4FF; line-height: 1.1; margin-bottom: 6px;
+    }
+    .vastu-hero-sub { font-size: 11px; color: #7aaed4; letter-spacing: 1.5px; text-transform: uppercase; }
+ 
+    .vastu-compass {
+      margin: 20px 20px 0;
+      background: white; border-radius: 20px; padding: 20px;
+      border: 0.5px solid #D3D1C7;
+    }
+    .compass-title {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888780; margin-bottom: 16px; text-align: center;
+    }
+    .compass-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    }
+    .compass-cell {
+      border-radius: 12px; padding: 10px 8px; text-align: center; transition: transform 0.15s;
+    }
+    .compass-cell:hover { transform: scale(1.03); }
+    .compass-cell.active { ring: 2px solid #EF9F27; }
+    .compass-dir { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.6; margin-bottom: 4px; }
+    .compass-zone { font-size: 11px; font-weight: 500; line-height: 1.3; margin-bottom: 3px; }
+    .compass-element { font-size: 10px; opacity: 0.7; }
+    .compass-center {
+      background: #1a1208; color: #EF9F27; border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .compass-center-symbol { font-size: 22px; line-height: 1; }
+    .compass-center-label { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; opacity: 0.7; }
+ 
+    .vastu-today-card {
+      margin: 12px 20px 0;
+      background: linear-gradient(135deg, #E6F1FB, #f0f7ff);
+      border: 0.5px solid #378ADD; border-radius: 16px; padding: 16px;
+    }
+    .vastu-today-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #378ADD; margin-bottom: 8px; }
+    .vastu-today-dir {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px; font-weight: 300; color: #0C447C; margin-bottom: 4px;
+    }
+    .vastu-today-desc { font-size: 12px; color: #1a4a7c; line-height: 1.6; }
+ 
+    .vastu-rules { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+    .vastu-rule-card {
+      background: white; border: 0.5px solid #D3D1C7; border-radius: 14px; padding: 14px 16px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .vastu-rule-icon {
+      width: 36px; height: 36px; border-radius: 10px; background: #E6F1FB;
+      display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+    }
+    .vastu-rule-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+    .vastu-rule-desc { font-size: 11px; color: #888780; line-height: 1.5; }
+ 
+    /* ════════════════════════════════════════
+       FENG SHUI VIEW
+    ════════════════════════════════════════ */
+    .feng-hero {
+      background: linear-gradient(160deg, #0a2a10 0%, #1a4a1a 60%, #1e5a20 100%);
+      padding: 28px 20px 32px; position: relative; overflow: hidden;
+    }
+    .feng-hero::before {
+      content: ''; position: absolute; top: -20px; right: -20px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(99,153,34,0.3) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .feng-hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px; font-weight: 300; color: #E6FFE8; line-height: 1.1; margin-bottom: 6px;
+    }
+    .feng-hero-sub { font-size: 11px; color: #7aad7a; letter-spacing: 1.5px; text-transform: uppercase; }
+ 
+    .feng-bagua {
+      margin: 20px 20px 0;
+      background: white; border-radius: 20px; padding: 20px; border: 0.5px solid #D3D1C7;
+    }
+    .bagua-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888780; margin-bottom: 16px; text-align: center; }
+    .bagua-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .bagua-cell {
+      border-radius: 12px; padding: 10px 8px; text-align: center;
+      transition: transform 0.15s; cursor: default;
+    }
+    .bagua-cell:hover { transform: scale(1.03); }
+    .bagua-dir { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.6; margin-bottom: 3px; }
+    .bagua-life { font-size: 11px; font-weight: 500; margin-bottom: 2px; }
+    .bagua-element-tag { font-size: 10px; opacity: 0.7; }
+    .bagua-center {
+      background: #1a1208; color: #EF9F27; border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+ 
+    .feng-elements { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+    .feng-element-card {
+      border-radius: 16px; padding: 16px; position: relative; overflow: hidden;
+    }
+    .feng-el-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .feng-el-icon { font-size: 24px; }
+    .feng-el-name { font-size: 15px; font-weight: 500; }
+    .feng-el-season { font-size: 11px; opacity: 0.7; }
+    .feng-el-desc { font-size: 12px; line-height: 1.6; opacity: 0.85; }
+    .feng-el-qualities { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .feng-el-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,0.2); }
+    .feng-today-banner {
+      margin: 12px 20px 0;
+      background: linear-gradient(135deg, #EAF3DE, #f0f8e8);
+      border: 0.5px solid #639922; border-radius: 16px; padding: 16px;
+    }
+    .feng-today-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #639922; margin-bottom: 8px; }
+    .feng-today-element {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px; font-weight: 300; color: #27500A; margin-bottom: 4px;
+    }
+    .feng-today-desc { font-size: 12px; color: #2a5a0a; line-height: 1.6; }
+  </style>
+</head>
+<body>
+<div class="app">
+ 
+  <!-- Top bar -->
+  <div class="top-bar">
+    <span class="day-label" id="currentDay">Saturday</span>
+    <span class="app-name">Chi · Prana</span>
+    <span class="element-badge" id="elementBadge">Wood + Ether</span>
+  </div>
+ 
+  <!-- ══════════ TODAY TAB ══════════ -->
+  <div class="tab-view active" id="tab-today">
+    <div class="hero">
+      <div class="compass-ring"></div>
+      <div class="compass-ring2"></div>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:3px;color:#EF9F27;text-transform:uppercase;margin-bottom:8px;" id="planetLabel">Day of Jupiter</div>
+      <div class="hero-title">Today's<br>sacred palette</div>
+      <div class="hero-sub" id="dateLabel">April 25 · Vastu &amp; Feng Shui guide</div>
+      <div class="element-row">
+        <span class="element-chip active" id="chip1">Wood element</span>
+        <span class="element-chip active" id="chip2">Ether / Akasha</span>
+        <span class="element-chip" id="chip3">Jupiter governed</span>
+      </div>
+    </div>
+ 
+    <div style="padding:16px 20px 4px;">
+      <div class="vastu-strip">
+        <div class="strip-label">Vastu Shastra</div>
+        <span id="vastuText">Thursday governs the North-East direction.</span>
+      </div>
+      <div class="feng-strip">
+        <div class="strip-label">Feng Shui</div>
+        <span id="fengText">Wood energy peaks on Thursday.</span>
+      </div>
+    </div>
+ 
+    <div class="section">
+      <div class="section-label">Wear today — most auspicious</div>
+      <div class="color-grid" id="colorGrid"></div>
+    </div>
+ 
+    <div class="avoid-strip" id="avoidStrip">
+      <div class="avoid-dot"></div>
+      <div class="avoid-text" id="avoidText"></div>
+    </div>
+ 
+    <div class="divider"></div>
+ 
+    <div class="section">
+      <div class="section-label">Best activities for today</div>
+      <div class="activities-list" id="activitiesList"></div>
+    </div>
+ 
+    <div class="divider"></div>
+ 
+    <div class="api-notice">
+      <strong>⚙ Developer setup required</strong>
+      To use the outfit scanner, enter your Anthropic API key below. In production this should be handled by a secure backend.
+      <input class="api-key-input" type="password" id="apiKeyInput" placeholder="sk-ant-..." />
+    </div>
+ 
+    <div class="outfit-scanner">
+      <div class="scanner-title">Outfit reader</div>
+      <div class="scanner-sub">SCAN YOUR LOOK · GET ENERGY READING</div>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)">
+        <img id="previewImg" class="preview-img" alt="outfit preview">
+        <div id="uploadPlaceholder">
+          <div class="upload-icon">👗</div>
+          <span class="upload-label">Tap to photograph your outfit</span>
+          <span class="upload-hint">or upload from gallery</span>
+        </div>
+      </div>
+      <button class="scan-btn" id="scanBtn" onclick="analyseOutfit()">Read the energy</button>
+      <div class="result-panel" id="resultPanel">
+        <div class="result-verdict" id="resultVerdict"></div>
+        <div class="result-detail" id="resultDetail"></div>
+        <div class="result-tags" id="resultTags"></div>
+      </div>
+    </div>
+    <div style="height:10px;"></div>
+  </div>
+ 
+  <!-- ══════════ WEEK TAB ══════════ -->
+  <div class="tab-view" id="tab-week">
+    <div class="week-hero">
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:3px;color:#EF9F27;text-transform:uppercase;margin-bottom:8px;">Seven Sacred Days</div>
+      <div class="week-hero-title">Weekly<br>energy guide</div>
+      <div class="week-hero-sub" id="weekSubLabel">April 2025 · planetary overview</div>
+    </div>
+    <div class="week-list" id="weekList"></div>
+    <div style="height:10px;"></div>
+  </div>
+ 
+  <!-- ══════════ VASTU TAB ══════════ -->
+  <div class="tab-view" id="tab-vastu">
+    <div class="vastu-hero">
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:3px;color:#7EC8F0;text-transform:uppercase;margin-bottom:8px;">Ancient Wisdom</div>
+      <div class="vastu-hero-title">Vastu<br>Shastra</div>
+      <div class="vastu-hero-sub">Directional energy · sacred space</div>
+    </div>
+ 
+    <div class="vastu-today-card" id="vastuTodayCard">
+      <div class="vastu-today-label">Today's Active Direction</div>
+      <div class="vastu-today-dir" id="vastuTodayDir">North-East</div>
+      <div class="vastu-today-desc" id="vastuTodayDesc">Loading…</div>
+    </div>
+ 
+    <div class="vastu-compass">
+      <div class="compass-title">Vastu Purusha Mandala</div>
+      <div class="compass-grid" id="vastuCompassGrid"></div>
+    </div>
+ 
+    <div style="padding:16px 20px 4px;">
+      <div class="section-label">Core Vastu Principles</div>
+    </div>
+    <div class="vastu-rules">
+      <div class="vastu-rule-card">
+        <div class="vastu-rule-icon">🧭</div>
+        <div>
+          <div class="vastu-rule-title">Directions are alive</div>
+          <div class="vastu-rule-desc">Each cardinal and intercardinal direction carries a specific energy quality governed by a deity, planet, and element. Aligning your actions to the day's direction amplifies positive chi.</div>
+        </div>
+      </div>
+      <div class="vastu-rule-card">
+        <div class="vastu-rule-icon">🌅</div>
+        <div>
+          <div class="vastu-rule-title">East — the sacred entry</div>
+          <div class="vastu-rule-desc">Always the most auspicious direction for the entrance of a home. Sunrise energy flows in from the East, bringing health, vitality, and new beginnings into the space.</div>
+        </div>
+      </div>
+      <div class="vastu-rule-card">
+        <div class="vastu-rule-icon">🏔</div>
+        <div>
+          <div class="vastu-rule-title">North-East — Ishanya</div>
+          <div class="vastu-rule-desc">The most sacred corner in Vastu. Keep this zone clean, uncluttered, and open. Place your altar, meditation space, or water feature here to activate divine wisdom energy.</div>
+        </div>
+      </div>
+      <div class="vastu-rule-card">
+        <div class="vastu-rule-icon">🔥</div>
+        <div>
+          <div class="vastu-rule-title">South-East — Agni corner</div>
+          <div class="vastu-rule-desc">Governed by Agni, the fire deity. Ideal placement for kitchen and fire elements. Activates digestion, transformation, and the energy of wealth creation.</div>
+        </div>
+      </div>
+      <div class="vastu-rule-card">
+        <div class="vastu-rule-icon">💨</div>
+        <div>
+          <div class="vastu-rule-title">North-West — Vayu zone</div>
+          <div class="vastu-rule-desc">Governed by Vayu, the wind deity. This zone rules movement, social connections, and travel. Place guest rooms or storage here to keep this energy mobile and light.</div>
+        </div>
+      </div>
+    </div>
+    <div style="height:10px;"></div>
+  </div>
+ 
+  <!-- ══════════ FENG SHUI TAB ══════════ -->
+  <div class="tab-view" id="tab-feng">
+    <div class="feng-hero">
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:3px;color:#9FE1A0;text-transform:uppercase;margin-bottom:8px;">Five Elements</div>
+      <div class="feng-hero-title">Feng<br>Shui</div>
+      <div class="feng-hero-sub">elemental flow · wu xing system</div>
+    </div>
+ 
+    <div class="feng-today-banner" id="fengTodayBanner">
+      <div class="feng-today-label">Today's Dominant Element</div>
+      <div class="feng-today-element" id="fengTodayElement">Wood</div>
+      <div class="feng-today-desc" id="fengTodayDesc">Loading…</div>
+    </div>
+ 
+    <div class="feng-bagua" style="margin-top:12px;">
+      <div class="bagua-title">Ba-Gua Energy Map</div>
+      <div class="bagua-grid" id="baguaGrid"></div>
+    </div>
+ 
+    <div style="padding:16px 20px 4px;">
+      <div class="section-label">The Five Elements</div>
+    </div>
+    <div class="feng-elements">
+      <div class="feng-element-card" style="background:#1a3a1a;color:#C0DD97;">
+        <div class="feng-el-header">
+          <span class="feng-el-icon">🌿</span>
+          <div><div class="feng-el-name">Wood</div><div class="feng-el-season">Spring · Thursday & Monday</div></div>
+        </div>
+        <div class="feng-el-desc">Wood energy is growth, expansion, and new beginnings. It governs creativity, ambition, and the upward movement of life force. Associated with green and teal colours.</div>
+        <div class="feng-el-qualities">
+          <span class="feng-el-tag">Growth</span><span class="feng-el-tag">Creativity</span><span class="feng-el-tag">Flexibility</span><span class="feng-el-tag">Vision</span>
+        </div>
+      </div>
+      <div class="feng-element-card" style="background:#5c1a1a;color:#F5C4B3;">
+        <div class="feng-el-header">
+          <span class="feng-el-icon">🔥</span>
+          <div><div class="feng-el-name">Fire</div><div class="feng-el-season">Summer · Sunday & Tuesday</div></div>
+        </div>
+        <div class="feng-el-desc">Fire energy is passion, visibility, and transformation. It governs fame, recognition, and the radiant expression of self. Associated with red, orange, and bright yellow.</div>
+        <div class="feng-el-qualities">
+          <span class="feng-el-tag">Passion</span><span class="feng-el-tag">Courage</span><span class="feng-el-tag">Clarity</span><span class="feng-el-tag">Fame</span>
+        </div>
+      </div>
+      <div class="feng-element-card" style="background:#3a2a10;color:#FAC775;">
+        <div class="feng-el-header">
+          <span class="feng-el-icon">🏔</span>
+          <div><div class="feng-el-name">Earth</div><div class="feng-el-season">Late summer · Wednesday & Saturday</div></div>
+        </div>
+        <div class="feng-el-desc">Earth energy is stability, nourishment, and groundedness. It governs relationships, self-care, and the steady accumulation of resources. Associated with yellow, beige, and brown.</div>
+        <div class="feng-el-qualities">
+          <span class="feng-el-tag">Stability</span><span class="feng-el-tag">Nourishment</span><span class="feng-el-tag">Trust</span><span class="feng-el-tag">Home</span>
+        </div>
+      </div>
+      <div class="feng-element-card" style="background:#2a2a3a;color:#D3D1C7;">
+        <div class="feng-el-header">
+          <span class="feng-el-icon">⚔</span>
+          <div><div class="feng-el-name">Metal</div><div class="feng-el-season">Autumn · Saturday</div></div>
+        </div>
+        <div class="feng-el-desc">Metal energy is precision, clarity, and refinement. It governs logic, communication, and the ability to let go of what no longer serves. Associated with white, silver, and grey.</div>
+        <div class="feng-el-qualities">
+          <span class="feng-el-tag">Precision</span><span class="feng-el-tag">Logic</span><span class="feng-el-tag">Release</span><span class="feng-el-tag">Clarity</span>
+        </div>
+      </div>
+      <div class="feng-element-card" style="background:#1a2a4a;color:#B5D4F4;">
+        <div class="feng-el-header">
+          <span class="feng-el-icon">🌊</span>
+          <div><div class="feng-el-name">Water</div><div class="feng-el-season">Winter · Monday & Friday</div></div>
+        </div>
+        <div class="feng-el-desc">Water energy is flow, wisdom, and depth. It governs career, life path, and the ability to move around obstacles with grace. Associated with black, deep blue, and navy.</div>
+        <div class="feng-el-qualities">
+          <span class="feng-el-tag">Flow</span><span class="feng-el-tag">Wisdom</span><span class="feng-el-tag">Depth</span><span class="feng-el-tag">Career</span>
+        </div>
+      </div>
+    </div>
+    <div style="height:10px;"></div>
+  </div>
+ 
+  <!-- Nav bar -->
+  <div class="nav-bar">
+    <div class="nav-item active" onclick="switchTab('today', this)"><div class="nav-icon">☀</div>Today</div>
+    <div class="nav-item" onclick="switchTab('week', this)"><div class="nav-icon">🗓</div>Week</div>
+    <div class="nav-item" onclick="switchTab('vastu', this)"><div class="nav-icon">🧭</div>Vastu</div>
+    <div class="nav-item" onclick="switchTab('feng', this)"><div class="nav-icon">☯</div>Feng Shui</div>
+  </div>
+ 
+</div>
+ 
+<script>
+  /* ─── DAY DATA ─── */
+  const DAY_DATA = {
+    0: {
+      name:'Sunday', planet:'Day of the Sun', elements:['Fire element','Pitta energy','Sun governed'],
+      elementBadge:'Fire + Light',
+      vastu:'Sunday aligns with the East direction — the zone of the rising sun, health, and new beginnings. Honour solar energy in your dress.',
+      vastuDir:'East', vastuZone:'Health & New Beginnings',
+      feng:'Fire element dominates Sunday. Bright, warm colours activate yang energy, confidence, and vitality chi.',
+      fengElement:'Fire', fengDesc:'Sunday pulses with Fire energy — the most yang day of the week. Wear warm, bold colours to amplify visibility, vitality, and solar confidence.',
+      colors:[
+        {bg:'#5c2a10',swatch:'#E8560A',name:'Burnt Orange',reason:'Solar fire · ignites vitality',power:'Strongest',textColor:'#F5C4B3'},
+        {bg:'#5c4a00',swatch:'#D4A017',name:'Solar Gold',reason:'Sun metal · attracts recognition',power:'Radiance',textColor:'#FAC775'},
+        {bg:'#5c1a1a',swatch:'#C0392B',name:'Ruby Red',reason:'Fire element · activates fame',power:'Power',textColor:'#F7C1C1'},
+        {bg:'#3a3a1a',swatch:'#C8B45A',name:'Warm Cream',reason:'Earth feeds fire · grounding solar',power:'Balance',textColor:'#D3D1C7'},
+      ],
+      avoid:'Avoid cool blues and black — water extinguishes fire energy and suppresses Sunday\'s solar vitality.',
+      activities:[
+        {icon:'☀',iconBg:'icon-gold',name:'Morning sun salutations',desc:'East-facing yoga activates solar prana at peak potency'},
+        {icon:'👑',iconBg:'icon-gold',name:'Leadership & presentations',desc:'Sun\'s yang energy makes Sunday ideal for visibility'},
+        {icon:'❤',iconBg:'icon-purple',name:'Family & social gatherings',desc:'Vastu: East direction promotes warmth'},
+        {icon:'🌱',iconBg:'icon-green',name:'Starting new projects',desc:'Sunrise energy marks the perfect moment for fresh beginnings'},
+      ],
+    },
+    1: {
+      name:'Monday', planet:'Day of the Moon', elements:['Water element','Lunar energy','Moon governed'],
+      elementBadge:'Water + Intuition',
+      vastu:'Monday aligns with the North-West — the zone of air, movement, and social connections.',
+      vastuDir:'North-West', vastuZone:'Movement & Social Bonds',
+      feng:'Water element flows on Monday. Soft, reflective colours nurture intuition, calm, and emotional intelligence.',
+      fengElement:'Water', fengDesc:'Monday flows with Water energy — intuitive, deep, and emotionally rich. Wear blues and soft whites to honour the moon\'s reflective, introspective quality.',
+      colors:[
+        {bg:'#1a2a4a',swatch:'#A8C8E8',name:'Moonlit Blue',reason:'Lunar water · calms and opens intuition',power:'Strongest',textColor:'#B5D4F4'},
+        {bg:'#2a2a3a',swatch:'#D8D0F0',name:'Soft Lavender',reason:'Moon ether · enhances receptivity',power:'Mystic',textColor:'#CECBF6'},
+        {bg:'#1a3a3a',swatch:'#A0D8D0',name:'Sea Green',reason:'Water meeting wood · emotional healing',power:'Healing',textColor:'#9FE1CB'},
+        {bg:'#3a3a3a',swatch:'#E8E4DC',name:'Pearl White',reason:'Moon reflection · purity and clarity',power:'Clarity',textColor:'#D3D1C7'},
+      ],
+      avoid:'Avoid harsh reds and strong oranges — fire energy conflicts with the moon\'s gentle water vibration.',
+      activities:[
+        {icon:'🧘',iconBg:'icon-purple',name:'Meditation & journaling',desc:'Lunar energy heightens inner awareness'},
+        {icon:'🌊',iconBg:'icon-blue',name:'Water-based practices',desc:'Swimming or baths amplify Monday\'s healing chi'},
+        {icon:'🤝',iconBg:'icon-blue',name:'Nurturing relationships',desc:'Vastu: North-West promotes social bonds'},
+        {icon:'🎨',iconBg:'icon-purple',name:'Creative and artistic work',desc:'Moon\'s intuitive energy flows into art and music'},
+      ],
+    },
+    2: {
+      name:'Tuesday', planet:'Day of Mars', elements:['Fire element','Mars energy','Courage governed'],
+      elementBadge:'Fire + Mars',
+      vastu:'Tuesday aligns with the South direction — the zone of fame, recognition, and Mars\'s warrior energy.',
+      vastuDir:'South', vastuZone:'Fame & Recognition',
+      feng:'Mars fire dominates Tuesday. Red and bold colours activate assertive yang, drive, and competitive chi.',
+      fengElement:'Fire', fengDesc:'Tuesday burns with Mars Fire — the warrior\'s energy. Bold, decisive action is amplified today. Wear reds and deep golds to channel courage and competitive spirit.',
+      colors:[
+        {bg:'#5c1010',swatch:'#C0392B',name:'Mars Red',reason:'Mars fire · courage and warrior spirit',power:'Strongest',textColor:'#F7C1C1'},
+        {bg:'#5c2a10',swatch:'#E8560A',name:'Burnt Sienna',reason:'Fire earth · grounded strength',power:'Action',textColor:'#F5C4B3'},
+        {bg:'#4a1010',swatch:'#A93226',name:'Deep Crimson',reason:'South direction · fame and recognition',power:'Power',textColor:'#F5C4B3'},
+        {bg:'#4a3a10',swatch:'#D4A017',name:'Warrior Gold',reason:'Solar metal · amplifies Mars ambition',power:'Victory',textColor:'#FAC775'},
+      ],
+      avoid:'Avoid soft pinks and pastels — gentle energy is overpowered by Mars\'s fire and weakens resolve.',
+      activities:[
+        {icon:'💪',iconBg:'icon-gold',name:'Physical exercise & sport',desc:'Mars governs strength — ideal for intense workouts'},
+        {icon:'⚔',iconBg:'icon-gold',name:'Difficult conversations',desc:'South Mars energy gives courage to address conflict'},
+        {icon:'🔨',iconBg:'icon-green',name:'Mechanical & technical work',desc:'Mars rules machinery — great day for repairs'},
+        {icon:'🏆',iconBg:'icon-gold',name:'Competitive activities',desc:'Harness Mars chi for negotiations and challenges'},
+      ],
+    },
+    3: {
+      name:'Wednesday', planet:'Day of Mercury', elements:['Earth element','Mercury energy','Communication'],
+      elementBadge:'Earth + Mercury',
+      vastu:'Wednesday aligns with the North direction — the zone of wealth, career, and Mercury\'s intelligence.',
+      vastuDir:'North', vastuZone:'Wealth & Career',
+      feng:'Mercury\'s earth energy promotes quick thinking. Green and earthy colours activate mental agility and communication chi.',
+      fengElement:'Earth', fengDesc:'Wednesday carries Mercury\'s Earth energy — quick, communicative, and mentally sharp. Greens and warm greys help ground the mind while keeping ideas flowing freely.',
+      colors:[
+        {bg:'#1a3a1a',swatch:'#27AE60',name:'Mercury Green',reason:'Mercury earth · quickens mind',power:'Strongest',textColor:'#C0DD97'},
+        {bg:'#2a3a2a',swatch:'#A9CCE3',name:'Sky Blue',reason:'Air of Mercury · clarity of thought',power:'Clarity',textColor:'#B5D4F4'},
+        {bg:'#3a3a1a',swatch:'#D5DBBB',name:'Sage Green',reason:'Earth element · grounds quick energy',power:'Grounded',textColor:'#C0DD97'},
+        {bg:'#2a2a2a',swatch:'#AEB6BF',name:'Warm Grey',reason:'Mercury metal · analytical precision',power:'Focus',textColor:'#D3D1C7'},
+      ],
+      avoid:'Avoid deep purples and heavy tones — they slow Mercury\'s quick mental vibration.',
+      activities:[
+        {icon:'✍',iconBg:'icon-green',name:'Writing & communication',desc:'Mercury governs words — ideal for writing and speeches'},
+        {icon:'📊',iconBg:'icon-blue',name:'Business meetings',desc:'North direction activates career conversations'},
+        {icon:'📚',iconBg:'icon-gold',name:'Learning new skills',desc:'Mercury\'s quick chi absorbs information rapidly'},
+        {icon:'🗺',iconBg:'icon-green',name:'Short journeys & errands',desc:'Mercury rules movement — travel and networking favoured'},
+      ],
+    },
+    4: {
+      name:'Thursday', planet:'Day of Jupiter', elements:['Wood element','Ether / Akasha','Jupiter governed'],
+      elementBadge:'Wood + Ether',
+      vastu:'Thursday governs the North-East direction — the zone of wisdom and divine energy. Dress to honour Jupiter\'s expansive vibration.',
+      vastuDir:'North-East', vastuZone:'Wisdom & Divine Energy',
+      feng:'Wood energy peaks on Thursday. Colours that reflect growth, water feeding wood, and earth grounding are most auspicious.',
+      fengElement:'Wood', fengDesc:'Thursday is Jupiter\'s Wood day — expansive, wise, and abundant. This is the most auspicious day of the week for growth. Blues, greens, and gold align with Jupiter\'s generous chi.',
+      colors:[
+        {bg:'#1a3a5c',swatch:'#4A90D9',name:'Royal Blue',reason:'Jupiter\'s hue · wisdom & prosperity',power:'Strongest',textColor:'#B5D4F4'},
+        {bg:'#2a4a1a',swatch:'#5B9C3A',name:'Forest Green',reason:'Wood element · amplifies energy flow',power:'Growth',textColor:'#C0DD97'},
+        {bg:'#4a3a10',swatch:'#D4A017',name:'Deep Gold',reason:'Earth feeds wood · attracts abundance',power:'Wealth',textColor:'#FAC775'},
+        {bg:'#3a1a3a',swatch:'#8E44AD',name:'Soft Violet',reason:'Ether / Akasha · spiritual clarity',power:'Calm',textColor:'#CECBF6'},
+      ],
+      avoid:'Avoid heavy black, harsh red, or grey — these suppress Jupiter\'s expansive wood energy.',
+      activities:[
+        {icon:'📚',iconBg:'icon-gold',name:'Study & deep learning',desc:'Jupiter rules knowledge — ideal for studying'},
+        {icon:'🤝',iconBg:'icon-blue',name:'Seeking guidance or mentors',desc:'North-east energy opens channels to teachers and guides'},
+        {icon:'🌿',iconBg:'icon-green',name:'Planting & tending gardens',desc:'Wood day — sowing seeds carries extra power'},
+        {icon:'🙏',iconBg:'icon-purple',name:'Prayer & meditation facing NE',desc:'Ishanya corner is charged — meditate facing north-east'},
+        {icon:'💼',iconBg:'icon-gold',name:'Signing contracts & ventures',desc:'Jupiter\'s chi makes Thursday excellent for commitments'},
+      ],
+    },
+    5: {
+      name:'Friday', planet:'Day of Venus', elements:['Water element','Venus energy','Beauty governed'],
+      elementBadge:'Water + Venus',
+      vastu:'Friday aligns with the South-East direction — the zone of Venus, beauty, and abundance.',
+      vastuDir:'South-East', vastuZone:'Beauty & Abundance',
+      feng:'Venus water energy flows on Friday. Soft pinks, whites, and blues activate love chi and harmonious relationships.',
+      fengElement:'Water', fengDesc:'Friday carries Venus Water energy — fluid, creative, and magnetically beautiful. Rose pinks and soft blues help attract love, abundance, and artistic inspiration.',
+      colors:[
+        {bg:'#4a1a2a',swatch:'#E8A0B0',name:'Rose Pink',reason:'Venus love · attracts harmony',power:'Strongest',textColor:'#F5C4B3'},
+        {bg:'#3a3a3a',swatch:'#FDFEFE',name:'Pure White',reason:'Venus purity · clarity of heart',power:'Clarity',textColor:'#D3D1C7'},
+        {bg:'#1a2a4a',swatch:'#7FB3D3',name:'Aqua Blue',reason:'Water of Venus · emotional flow',power:'Flow',textColor:'#B5D4F4'},
+        {bg:'#3a1a3a',swatch:'#C39BD3',name:'Lilac',reason:'Venus ether · spiritual love',power:'Mystic',textColor:'#CECBF6'},
+      ],
+      avoid:'Avoid dark navy and heavy earth tones — they suppress Venus\'s light, creative water energy.',
+      activities:[
+        {icon:'💃',iconBg:'icon-purple',name:'Dance & creative arts',desc:'Venus governs beauty — ideal for music, dance, and design'},
+        {icon:'💕',iconBg:'icon-purple',name:'Romance & relationships',desc:'South-East activates Venus bonds'},
+        {icon:'🛁',iconBg:'icon-blue',name:'Self-care & beautification',desc:'Venus water cleanses — indulge in baths and skincare'},
+        {icon:'💰',iconBg:'icon-gold',name:'Shopping & financial planning',desc:'Lakshmi energy flows on Friday — auspicious for purchases'},
+      ],
+    },
+    6: {
+      name:'Saturday', planet:'Day of Saturn', elements:['Earth element','Saturn energy','Discipline governed'],
+      elementBadge:'Earth + Saturn',
+      vastu:'Saturday aligns with the West direction — the zone of Saturn, discipline, and the harvest of karma.',
+      vastuDir:'West', vastuZone:'Discipline & Karma',
+      feng:'Earth and metal energy consolidates Saturday. Dark blues, blacks, and greys channel Saturn\'s structured chi.',
+      fengElement:'Metal', fengDesc:'Saturday holds Saturn\'s Metal and Earth energy — serious, structured, and karmic. Deep blues, greys, and dark greens align with the day\'s disciplined vibration.',
+      colors:[
+        {bg:'#1a1a2a',swatch:'#2C3E50',name:'Midnight Blue',reason:'Saturn depth · focus and karmic clarity',power:'Strongest',textColor:'#B5D4F4'},
+        {bg:'#2a2a2a',swatch:'#808B96',name:'Steel Grey',reason:'Saturn metal · precision and structure',power:'Structure',textColor:'#D3D1C7'},
+        {bg:'#1a2a1a',swatch:'#1E8449',name:'Dark Green',reason:'Earth element · patience and endurance',power:'Patience',textColor:'#C0DD97'},
+        {bg:'#3a2a1a',swatch:'#784212',name:'Deep Brown',reason:'Saturn earth · roots and foundations',power:'Roots',textColor:'#FAC775'},
+      ],
+      avoid:'Avoid bright reds and flashy colours — they conflict with Saturn\'s serious earth energy.',
+      activities:[
+        {icon:'🧹',iconBg:'icon-blue',name:'Cleaning & decluttering',desc:'Saturn rules discipline — clear spaces release stagnant chi'},
+        {icon:'📋',iconBg:'icon-gold',name:'Long-term planning',desc:'West direction supports structures — plan goals and systems'},
+        {icon:'⚖',iconBg:'icon-blue',name:'Karmic reflection & fasting',desc:'Saturn governs karma — review actions with honesty'},
+        {icon:'🔧',iconBg:'icon-green',name:'Repair and maintenance',desc:'Saturn\'s metal energy is ideal for fixing and maintaining'},
+      ],
+    },
+  };
+ 
+  /* ── Vastu compass data ── */
+  const VASTU_COMPASS = [
+    {dir:'NW',zone:'Social & Travel',element:'Air',bg:'#e8f0fa',color:'#1a3a6a'},
+    {dir:'N',zone:'Wealth & Career',element:'Water',bg:'#e6f1fb',color:'#0c447c'},
+    {dir:'NE',zone:'Wisdom & Divine',element:'Space',bg:'#eef5ff',color:'#1a2a5a'},
+    {dir:'W',zone:'Creativity & Joy',element:'Earth',bg:'#faf0e0',color:'#5a3a10'},
+    {dir:'',zone:'',element:'',bg:'',color:'',isCenter:true},
+    {dir:'E',zone:'Health & Sun',element:'Fire',bg:'#fff0e0',color:'#7a3a10'},
+    {dir:'SW',zone:'Relationships',element:'Earth',bg:'#faf0d8',color:'#5a3010'},
+    {dir:'S',zone:'Fame & Success',element:'Fire',bg:'#fff0e8',color:'#7a2010'},
+    {dir:'SE',zone:'Abundance & Fire',element:'Fire',bg:'#fff4e0',color:'#6a3010'},
+  ];
+ 
+  /* ── Ba-Gua data ── */
+  const BAGUA = [
+    {dir:'SE',life:'Wealth',element:'Wood',bg:'#1a3a1a',color:'#C0DD97'},
+    {dir:'S',life:'Fame',element:'Fire',bg:'#5c1010',color:'#F5C4B3'},
+    {dir:'SW',life:'Love',element:'Earth',bg:'#4a3a10',color:'#FAC775'},
+    {dir:'E',life:'Family',element:'Wood',bg:'#1a3a1a',color:'#C0DD97'},
+    {dir:'',life:'',element:'',bg:'',color:'',isCenter:true},
+    {dir:'W',life:'Children',element:'Metal',bg:'#2a2a3a',color:'#D3D1C7'},
+    {dir:'NE',life:'Knowledge',element:'Earth',bg:'#3a3a10',color:'#FAC775'},
+    {dir:'N',life:'Career',element:'Water',bg:'#1a2a4a',color:'#B5D4F4'},
+    {dir:'NW',life:'Helpers',element:'Metal',bg:'#2a2a3a',color:'#D3D1C7'},
+  ];
+ 
+  /* ─── TAB SWITCHER ─── */
+  function switchTab(name, el) {
+    document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    el.classList.add('active');
+  }
+ 
+  /* ─── INIT ─── */
+  function init() {
+    const today = new Date();
+    const dow = today.getDay();
+    const data = DAY_DATA[dow];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+ 
+    // Top bar
+    document.getElementById('currentDay').textContent = data.name;
+    document.getElementById('elementBadge').textContent = data.elementBadge;
+ 
+    // Today tab
+    document.getElementById('planetLabel').textContent = data.planet;
+    document.getElementById('dateLabel').textContent = `${months[today.getMonth()]} ${today.getDate()} · Vastu & Feng Shui guide`;
+    document.getElementById('chip1').textContent = data.elements[0];
+    document.getElementById('chip2').textContent = data.elements[1];
+    document.getElementById('chip3').textContent = data.elements[2];
+    document.getElementById('vastuText').textContent = data.vastu;
+    document.getElementById('fengText').textContent = data.feng;
+ 
+    document.getElementById('colorGrid').innerHTML = data.colors.map(c => `
+      <div class="color-card" style="background:${c.bg};color:${c.textColor};">
+        <span class="power-tag">${c.power}</span>
+        <div class="color-swatch" style="background:${c.swatch};"></div>
+        <div class="color-name">${c.name}</div>
+        <div class="color-reason">${c.reason}</div>
+      </div>
+    `).join('');
+ 
+    document.getElementById('avoidText').innerHTML = `<strong style="color:#5F5E5A;">Avoid today:</strong> ${data.avoid}`;
+ 
+    document.getElementById('activitiesList').innerHTML = data.activities.map(a => `
+      <div class="activity-item">
+        <div class="activity-icon ${a.iconBg}">${a.icon}</div>
+        <div><div class="activity-name">${a.name}</div><div class="activity-desc">${a.desc}</div></div>
+      </div>
+    `).join('');
+ 
+    // Week tab
+    document.getElementById('weekSubLabel').textContent = `${months[today.getMonth()]} ${today.getFullYear()} · planetary overview`;
+    const weekList = document.getElementById('weekList');
+    const dayColors = ['#E8560A','#A8C8E8','#C0392B','#27AE60','#4A90D9','#E8A0B0','#2C3E50'];
+    const dayBgs = ['#5c2a10','#1a2a4a','#5c1010','#1a3a1a','#1a3a5c','#4a1a2a','#1a1a2a'];
+    weekList.innerHTML = Object.values(DAY_DATA).map((d, i) => {
+      const isToday = i === dow;
+      return `
+        <div class="week-card ${isToday ? 'today' : ''}">
+          <div class="week-day-badge" style="background:${dayBgs[i]};color:${d.colors[0].textColor};">
+            <div class="week-day-num" style="color:${dayColors[i]};">${i===0?'Su':i===1?'M':i===2?'Tu':i===3?'W':i===4?'Th':i===5?'Fr':'Sa'}</div>
+            <div class="week-badge-label" style="color:${dayColors[i]};opacity:0.7;">${d.elementBadge.split(' ')[0]}</div>
+          </div>
+          <div class="week-day-info">
+            <div class="week-day-name">${d.name}</div>
+            <div class="week-day-planet">${d.planet}</div>
+            <div class="week-color-dots">
+              ${d.colors.map(c => `<div class="week-dot" style="background:${c.swatch};"></div>`).join('')}
+            </div>
+          </div>
+          ${isToday ? '<div class="today-tag">Today</div>' : ''}
+        </div>
+      `;
+    }).join('');
+ 
+    // Vastu tab
+    document.getElementById('vastuTodayDir').textContent = data.vastuDir;
+    document.getElementById('vastuTodayDesc').textContent = data.vastu;
+    document.getElementById('vastuCompassGrid').innerHTML = VASTU_COMPASS.map(c => {
+      if (c.isCenter) return `
+        <div class="compass-cell compass-center">
+          <div class="compass-center-symbol">🏠</div>
+          <div class="compass-center-label">Brahma<br>Sthana</div>
+        </div>`;
+      const isActive = c.dir.includes(data.vastuDir.split('-').map(p=>p[0]).join('')) || data.vastuDir.includes(c.zone.split(' ')[0]);
+      return `
+        <div class="compass-cell" style="background:${c.bg};${isActive?'box-shadow:0 0 0 2px #378ADD;':''}">
+          <div class="compass-dir">${c.dir}</div>
+          <div class="compass-zone" style="color:${c.color};">${c.zone}</div>
+          <div class="compass-element" style="color:${c.color};">${c.element}</div>
+        </div>`;
+    }).join('');
+ 
+    // Feng Shui tab
+    document.getElementById('fengTodayElement').textContent = data.fengElement;
+    document.getElementById('fengTodayDesc').textContent = data.fengDesc;
+    document.getElementById('baguaGrid').innerHTML = BAGUA.map(b => {
+      if (b.isCenter) return `
+        <div class="bagua-cell bagua-center">
+          <div style="font-size:22px;">☯</div>
+          <div style="font-size:8px;letter-spacing:1px;text-transform:uppercase;margin-top:4px;opacity:0.7;">Centre<br>Balance</div>
+        </div>`;
+      return `
+        <div class="bagua-cell" style="background:${b.bg};color:${b.color};">
+          <div class="bagua-dir">${b.dir}</div>
+          <div class="bagua-life">${b.life}</div>
+          <div class="bagua-element-tag">${b.element}</div>
+        </div>`;
+    }).join('');
+  }
+ 
+  /* ─── FILE UPLOAD ─── */
+  function handleFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.getElementById('previewImg');
+      img.src = e.target.result;
+      img.style.display = 'block';
+      document.getElementById('uploadPlaceholder').style.display = 'none';
+      document.getElementById('scanBtn').style.display = 'block';
+      document.getElementById('resultPanel').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+ 
+  /* ─── OUTFIT ANALYSER ─── */
+  async function analyseOutfit() {
+    const apiKey = document.getElementById('apiKeyInput').value.trim();
+    if (!apiKey) { alert('Please enter your Anthropic API key above the scanner.'); return; }
+ 
+    const btn = document.getElementById('scanBtn');
+    const panel = document.getElementById('resultPanel');
+    const imgEl = document.getElementById('previewImg');
+ 
+    btn.innerHTML = 'Reading your energy <span class="loading-dots"><span></span><span></span><span></span></span>';
+    btn.disabled = true;
+    panel.style.display = 'none';
+ 
+    const base64 = imgEl.src.split(',')[1];
+    const mediaType = imgEl.src.split(';')[0].split(':')[1] || 'image/jpeg';
+    const today = new Date();
+    const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const todayName = dayNames[today.getDay()];
+    const data = DAY_DATA[today.getDay()];
+    const goodColors = data.colors.map(c => c.name).join(', ');
+ 
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({
+          model:'claude-sonnet-4-20250514', max_tokens:1000,
+          system:`You are a master of Vastu Shastra and Feng Shui with 30 years of practice. Today is ${todayName} — ${data.planet}. Auspicious colours for today are: ${goodColors}. Avoid: ${data.avoid}. Analyse the outfit in the image and give a warm, mystical but honest energy reading. Return ONLY valid JSON: {"verdict":"Auspicious","short_message":"Brief 5-7 word verdict","detail":"2-3 sentence detailed reading","tags":[{"label":"Short label","type":"good"}]} where verdict is Auspicious/Neutral/Inauspicious, tags 2-4 items with type good/warn/bad. Return ONLY the JSON, no markdown.`,
+          messages:[{role:'user',content:[
+            {type:'image',source:{type:'base64',media_type:mediaType,data:base64}},
+            {type:'text',text:`Analyse this outfit for ${todayName} energy according to Vastu Shastra and Feng Shui.`}
+          ]}]
+        })
+      });
+      const json = await response.json();
+      const raw = (json.content||[]).map(b=>b.text||'').join('');
+      const result = JSON.parse(raw.replace(/```json|```/g,'').trim());
+ 
+      const verdictClass = result.verdict==='Auspicious'?'verdict-yes':result.verdict==='Neutral'?'verdict-ok':'verdict-no';
+      const icon = result.verdict==='Auspicious'?'✦ ':result.verdict==='Neutral'?'◈ ':'✧ ';
+      const verdictEl = document.getElementById('resultVerdict');
+      verdictEl.className = 'result-verdict '+verdictClass;
+      verdictEl.textContent = icon+result.verdict+' — '+result.short_message;
+      document.getElementById('resultDetail').textContent = result.detail;
+      document.getElementById('resultTags').innerHTML = (result.tags||[]).map(t =>
+        `<span class="result-tag ${t.type==='good'?'tag-good':t.type==='warn'?'tag-warn':'tag-bad'}">${t.label}</span>`
+      ).join('');
+      panel.style.display = 'block';
+    } catch(err) {
+      const verdictEl = document.getElementById('resultVerdict');
+      verdictEl.className = 'result-verdict verdict-ok';
+      verdictEl.textContent = '◈ Could not read energy';
+      document.getElementById('resultDetail').textContent = 'Please check your API key and try again.';
+      document.getElementById('resultTags').innerHTML = '';
+      panel.style.display = 'block';
+    }
+    btn.innerHTML = 'Read the energy';
+    btn.disabled = false;
+  }
+ 
+  init();
+</script>
+</body>
+</html>
+ 
